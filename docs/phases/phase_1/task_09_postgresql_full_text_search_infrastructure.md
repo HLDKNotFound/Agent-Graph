@@ -451,4 +451,4 @@ Additionally, zero regressions were confirmed across all existing test suites:
 | **Canonical Migration Mirror** | `backend/migrations/20261118120000_postgresql_full_text_search_infrastructure/migration.sql` | Mirrored migration folder upholding double-canonical migration layout |
 | **Search Service & Query Suite** | `backend/fts_search_service.js` | Parameterized search service implementing basic, websearch, filtered, RBAC-enforced, and RRF retrieval |
 | **Verification Test Suite** | `backend/test_full_text_search.js` | 10-step end-to-end integration test validating GIN index, parsers, ranking, filtering, security, and RRF calculations |
-| **Architectural Documentation** | `docs/phase_1/task_09_postgresql_full_text_search_infrastructure.md` | Comprehensive architectural report detailing index behavior, SQL queries, RBAC gate, and BM25 distinction |
+| **Architectural Documentation** | `docs/phases/phase_1/task_09_postgresql_full_text_search_infrastructure.md` | Comprehensive architectural report detailing index behavior, SQL queries, RBAC gate, and BM25 distinction |

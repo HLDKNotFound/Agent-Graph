@@ -166,10 +166,10 @@ Development is organized into three sequential phases to ensure a stable MVP bef
 
 For complete, granular specifications, explore the dedicated documentation suite:
 
-- 📘 [**Technical Requirements Document (TRD)**](file:///home/mercury/AgentGraph/docs/technical_requirements.md): Deep-dive specs for all 10 modules, API schemas, and data models.
-- 📗 [**Non-Technical & Business Requirements (NFR)**](file:///home/mercury/AgentGraph/docs/non_technical_requirements.md): Business goals, 30 NFRs (Usability, Performance, Security, Scalability, Operations), and UX standards.
-- 🔬 [**Evaluation & Benchmark Specifications**](file:///home/mercury/AgentGraph/docs/evaluation_and_benchmark.md): Dataset schema, mathematical formulas for metrics, and experimental protocols.
-- 📑 [**Docs Overview Hub**](file:///home/mercury/AgentGraph/docs/README.md): System index and navigation guide.
+- 📘 [**Technical Requirements Document (TRD)**](file:///home/mercury/AgentGraph/docs/specifications/technical_requirements.md): Deep-dive specs for all 10 modules, API schemas, and data models.
+- 📗 [**Non-Technical & Business Requirements (NFR)**](file:///home/mercury/AgentGraph/docs/specifications/non_technical_requirements.md): Business goals, 30 NFRs (Usability, Performance, Security, Scalability, Operations), and UX standards.
+- 🔬 [**Evaluation & Benchmark Specifications**](file:///home/mercury/AgentGraph/docs/specifications/evaluation_and_benchmark.md): Dataset schema, mathematical formulas for metrics, and experimental protocols.
+- 📑 [**Docs Overview Hub**](file:///home/mercury/AgentGraph/docs/README.md): System index, architecture guides, and navigation hub.
 
 ---
 

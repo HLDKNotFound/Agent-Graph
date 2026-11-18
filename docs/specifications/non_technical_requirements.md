@@ -195,4 +195,4 @@ mindmap
 - **Zero RBAC Breach Incidents:** $0$ verified security incidents where an unauthorized user retrieved confidential cross-department data.
 
 ### 6.2. Acceptance Sign-off Matrix
-Prior to production sign-off, the deployment must pass validation across all 30 NFRs and achieve green status on the benchmark suite outlined in the [Evaluation & Benchmark Document](file:///home/mercury/AgentGraph/docs/evaluation_and_benchmark.md).
+Prior to production sign-off, the deployment must pass validation across all 30 NFRs and achieve green status on the benchmark suite outlined in the [Evaluation & Benchmark Document](file:///home/mercury/AgentGraph/docs/specifications/evaluation_and_benchmark.md).

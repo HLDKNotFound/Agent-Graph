@@ -71,8 +71,8 @@ All verification tests executed via `backend/test_database_security_performance.
 
 1. **Final Validated Prisma Schema**: [`backend/schema.prisma`](file:///home/mercury/AgentGraph/backend/schema.prisma) & [`backend/prisma/schema.prisma`](file:///home/mercury/AgentGraph/backend/prisma/schema.prisma)
 2. **Additional SQL Migration**: [`backend/prisma/migrations/20261118130000_database_security_performance_optimization/migration.sql`](file:///home/mercury/AgentGraph/backend/prisma/migrations/20261118130000_database_security_performance_optimization/migration.sql)
-3. **Database Relationship Documentation**: [`docs/database_relationships.md`](file:///home/mercury/AgentGraph/docs/database_relationships.md)
-4. **Tenant Isolation Documentation**: [`docs/tenant_isolation.md`](file:///home/mercury/AgentGraph/docs/tenant_isolation.md)
-5. **Indexing and Optimization Report**: [`docs/indexing_and_optimization_report.md`](file:///home/mercury/AgentGraph/docs/indexing_and_optimization_report.md)
-6. **Migration Execution Report**: [`docs/migration_execution_report.md`](file:///home/mercury/AgentGraph/docs/migration_execution_report.md)
-7. **List of Remaining Technical Limitations**: [`docs/technical_limitations.md`](file:///home/mercury/AgentGraph/docs/technical_limitations.md)
+3. **Database Relationship Documentation**: [`docs/architecture/database_relationships.md`](file:///home/mercury/AgentGraph/docs/architecture/database_relationships.md)
+4. **Tenant Isolation Documentation**: [`docs/architecture/tenant_isolation.md`](file:///home/mercury/AgentGraph/docs/architecture/tenant_isolation.md)
+5. **Indexing and Optimization Report**: [`docs/database/indexing_and_optimization_report.md`](file:///home/mercury/AgentGraph/docs/database/indexing_and_optimization_report.md)
+6. **Migration Execution Report**: [`docs/database/migration_execution_report.md`](file:///home/mercury/AgentGraph/docs/database/migration_execution_report.md)
+7. **List of Remaining Technical Limitations**: [`docs/architecture/technical_limitations.md`](file:///home/mercury/AgentGraph/docs/architecture/technical_limitations.md)
