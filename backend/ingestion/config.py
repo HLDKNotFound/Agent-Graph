@@ -86,6 +86,25 @@ class IngestionSettings(BaseSettings):
     )
 
     # ------------------------------------------
+    # Spreadsheet & Tabular Extraction Settings
+    # ------------------------------------------
+    spreadsheet_max_rows_per_sheet: int = Field(
+        default=50_000,
+        alias="SPREADSHEET_MAX_ROWS_PER_SHEET",
+        description="Maximum allowed rows to parse per worksheet before truncation",
+    )
+    spreadsheet_streaming_threshold_bytes: int = Field(
+        default=10_485_760,  # 10 MB
+        alias="SPREADSHEET_STREAMING_THRESHOLD_BYTES",
+        description="File size threshold above which streaming read-only mode is activated for spreadsheets",
+    )
+    spreadsheet_formula_policy: str = Field(
+        default="cached_values",
+        alias="SPREADSHEET_FORMULA_POLICY",
+        description="Policy for formula extraction: 'cached_values', 'formulas', or 'both'",
+    )
+
+    # ------------------------------------------
     # OCR & Scanned Document Configuration
     # ------------------------------------------
     ocr_enabled: bool = Field(

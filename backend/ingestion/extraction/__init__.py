@@ -24,6 +24,13 @@ from backend.ingestion.extraction.registry import (
     default_extractor_registry,
     register_extractor,
 )
+from backend.ingestion.extraction.spreadsheet import (
+    FORMULA_POLICY_DOCUMENTATION,
+    CsvExtractor,
+    OpenXMLXlsxExtractor,
+    SpreadsheetExtractor,
+    XlsxExtractor,
+)
 
 __all__ = [
     "DocumentExtractor",
@@ -31,6 +38,11 @@ __all__ = [
     "ScannedPDFExtractor",
     "DocxExtractor",
     "OpenXMLDocxExtractor",
+    "XlsxExtractor",
+    "OpenXMLXlsxExtractor",
+    "CsvExtractor",
+    "SpreadsheetExtractor",
+    "FORMULA_POLICY_DOCUMENTATION",
     "ExtractorRegistry",
     "default_extractor_registry",
     "register_extractor",

@@ -48,6 +48,18 @@ class IngestionOptions(BaseModel):
         default=True,
         description="Upsert embedding vectors into Qdrant vector database collection",
     )
+    emit_table_elements: bool = Field(
+        default=True,
+        description="Emit TableElement representing structured tables for spreadsheet worksheets",
+    )
+    emit_row_elements: bool = Field(
+        default=True,
+        description="Emit SpreadsheetRowElement representing individual row records",
+    )
+    max_rows_per_sheet: int | None = Field(
+        default=None,
+        description="Optional maximum rows to parse per worksheet before truncation",
+    )
 
 
 class IngestionContext(BaseModel):
