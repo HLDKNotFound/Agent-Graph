@@ -111,7 +111,8 @@ raw_documents/
 parsed_cache/
 extracted_tables/
 ocr_temp/
-storage/
+/storage/
+!backend/ingestion/storage/
 temp/
 tmp/
 

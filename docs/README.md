@@ -29,16 +29,20 @@ docs/
 │   └── indexing_and_optimization_report.md # Query plans, partial indexes & GIN deduplication
 │
 └── phases/                        # Phased Implementation & Verification Deliverables
-    └── phase_1/                   # Phase 1: Database Infrastructure & Foundations (Tasks 01–10)
-        ├── task_01_database_infrastructure.md
-        ├── task_02_multi_tenant_iam_core.md
-        ├── task_03_rbac_permission_management.md
-        ├── task_04_authentication_session_management.md
-        ├── task_05_enterprise_audit_logging.md
-        ├── task_06_document_metadata_classification.md
-        ├── task_07_document_versioning_historical_lineage.md
-        ├── task_09_postgresql_full_text_search_infrastructure.md
-        └── task_10_database_security_performance_optimization.md
+    ├── phase_1/                   # Phase 1: Database Infrastructure & Foundations (Tasks 01–10)
+    │   ├── task_01_database_infrastructure.md
+    │   ├── task_02_multi_tenant_iam_core.md
+    │   ├── task_03_rbac_permission_management.md
+    │   ├── task_04_authentication_session_management.md
+    │   ├── task_05_enterprise_audit_logging.md
+    │   ├── task_06_document_metadata_classification.md
+    │   ├── task_07_document_versioning_historical_lineage.md
+    │   ├── task_09_postgresql_full_text_search_infrastructure.md
+    │   └── task_10_database_security_performance_optimization.md
+    └── phase_2/                   # Phase 2: Ingestion & Indexing Pipeline (Tasks 01–05)
+        ├── task_01_ingestion_architecture_and_shared_interfaces.md
+        ├── task_02_file_validation_and_storage_abstraction.md
+        └── task_03_extraction_result_models_and_locator_contracts.md
 ```
 
 ---
@@ -93,6 +97,17 @@ Detailed task completion reports tracking implementation progress across Phase 1
 | 🗃️ [**Task 07: Document Versioning & Lineage**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_07_document_versioning_historical_lineage.md) | Version Control | DocumentVersion model, version sequencing, dual current-version identification |
 | 🔍 [**Task 09: Full-Text Search Infrastructure**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_09_postgresql_full_text_search_infrastructure.md) | Lexical Search | GIN index on `to_tsvector('simple', content)`, websearch query parsing, RBAC filtering |
 | 🚀 [**Task 10: Security & Performance Optimization**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_10_database_security_performance_optimization.md) | Hardening & Benchmarking | RLS multi-tenant policies, partial indexing, duplicate GIN removal, clean DB validation |
+
+---
+
+### 5. Phase 2 Implementation Reports (`docs/phases/phase_2/`)
+Detailed task completion reports tracking implementation progress across Phase 2: Ingestion & Indexing Pipeline.
+
+| Task Report | Focus Area | Key Deliverables |
+| :--- | :--- | :--- |
+| 🏗️ [**Task 01: Ingestion Architecture & Shared Interfaces**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_01_ingestion_architecture_and_shared_interfaces.md) | Ingestion Foundation | Subsystem architecture, Pydantic v2 data contracts, ChunkLocator provenance, ExtractorRegistry |
+| 🛡️ [**Task 02: File Validation & Storage Abstraction**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_02_file_validation_and_storage_abstraction.md) | Security & Storage | Magic byte detection (PDF, DOCX, XLSX, CSV), path traversal defenses, Local/S3 storage drivers, tenant isolation |
+| 📐 [**Task 03: Extraction Result Models & Locator Contracts**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_03_extraction_result_models_and_locator_contracts.md) | Ingestion Foundation | NormalizedElement contract, 1-based coordinates, GFM markdown serialization, canonical text offsets, source traceability |
 
 ---
 
