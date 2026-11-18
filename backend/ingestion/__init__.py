@@ -14,6 +14,7 @@ from backend.ingestion.exceptions import (
     DeduplicationError,
     EmbeddingError,
     EmptyFileError,
+    EncryptedDocumentError,
     ExtractionError,
     ExtractorExecutionError,
     ExtractorNotFoundError,
@@ -35,6 +36,7 @@ from backend.ingestion.exceptions import (
 from backend.ingestion.extraction import (
     DocumentExtractor,
     ExtractorRegistry,
+    NativePDFExtractor,
     default_extractor_registry,
     register_extractor,
 )
@@ -102,6 +104,7 @@ from backend.ingestion.validation import (
 __all__ = [
     # Subsystem Interfaces
     "DocumentExtractor",
+    "NativePDFExtractor",
     "ExtractorRegistry",
     "default_extractor_registry",
     "register_extractor",
@@ -177,6 +180,7 @@ __all__ = [
     "IngestionError",
     "ExtractionError",
     "UnsupportedDocumentTypeError",
+    "EncryptedDocumentError",
     "ExtractorNotFoundError",
     "ExtractorExecutionError",
     "CorruptDocumentError",

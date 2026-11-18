@@ -22,6 +22,11 @@ class UnsupportedDocumentTypeError(ExtractionError):
     pass
 
 
+class EncryptedDocumentError(ExtractionError):
+    """Raised when an input document is encrypted or password-protected and cannot be parsed without credentials."""
+    pass
+
+
 class ExtractorNotFoundError(ExtractionError):
     """Raised when no extractor is registered for the requested document type or format."""
     pass
