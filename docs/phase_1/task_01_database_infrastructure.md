@@ -209,4 +209,4 @@ pg_ctl -D postgres_data stop
 - [`docker-compose.yml`](file:///home/mercury/AgentGraph/docker-compose.yml): Containerized PostgreSQL 16+ pgvector stack.
 - [`backend/migrations/`](file:///home/mercury/AgentGraph/backend/migrations/): Versioned migration history directory.
 - [`docs/database_setup.md`](file:///home/mercury/AgentGraph/docs/database_setup.md): Database infrastructure and Prisma setup guide.
-- [`docs/task_01_database_infrastructure.md`](file:///home/mercury/AgentGraph/docs/task_01_database_infrastructure.md): Detailed task completion report (this document).
+- [`docs/phase_1/task_01_database_infrastructure.md`](file:///home/mercury/AgentGraph/docs/phase_1/task_01_database_infrastructure.md): Detailed task completion report (this document).
