@@ -79,13 +79,14 @@ model Tenant {
   updatedAt DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relationships
-  users       User[]
-  roles       Role[]
-  departments Department[]
-  sessions    Session[]
+  users            User[]
+  roles            Role[]
+  departments      Department[]
+  sessions         Session[]
   auditLogs        AuditLog[]
   documents        Document[]
   documentVersions DocumentVersion[]
+  documentChunks   DocumentChunk[]
 
   @@map("tenants")
 }
@@ -131,12 +132,12 @@ model User {
   updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   // Relationships
-  tenant             Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  department         Department?  @relation("DepartmentMembers", fields: [departmentId], references: [id], onDelete: SetNull)
-  managedDepartments Department[] @relation("DepartmentManager")
-  roles              UserRole[]   @relation("UserToUserRoles")
-  assignedRoles      UserRole[]   @relation("UserRoleAssignedBy")
-  sessions           Session[]
+  tenant                  Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  department              Department?       @relation("DepartmentMembers", fields: [departmentId], references: [id], onDelete: SetNull)
+  managedDepartments      Department[]      @relation("DepartmentManager")
+  roles                   UserRole[]        @relation("UserToUserRoles")
+  assignedRoles           UserRole[]        @relation("UserRoleAssignedBy")
+  sessions                Session[]
   auditLogs               AuditLog[]
   uploadedDocuments       Document[]        @relation("DocumentUploader")
   createdDocumentVersions DocumentVersion[] @relation("DocumentVersionCreator")
@@ -329,6 +330,7 @@ model Document {
   uploadedBy     User?             @relation("DocumentUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
   currentVersion DocumentVersion?  @relation("DocumentCurrentVersion", fields: [currentVersionId], references: [id], onDelete: SetNull)
   versions       DocumentVersion[] @relation("DocumentVersions")
+  chunks         DocumentChunk[]   @relation("DocumentToChunks")
 
   // Query Optimization & Deduplication Indexes
   @@index([tenantId, contentHash])
@@ -365,10 +367,11 @@ model DocumentVersion {
   deletedAt        DateTime?               @map("deleted_at") @db.Timestamptz(6)
 
   // Relationships
-  document           Document  @relation("DocumentVersions", fields: [documentId], references: [id], onDelete: Cascade)
-  currentForDocument Document? @relation("DocumentCurrentVersion")
-  tenant             Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  createdBy          User?     @relation("DocumentVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  document           Document        @relation("DocumentVersions", fields: [documentId], references: [id], onDelete: Cascade)
+  currentForDocument Document?       @relation("DocumentCurrentVersion")
+  tenant             Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy          User?           @relation("DocumentVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  chunks             DocumentChunk[] @relation("DocumentVersionToChunks")
 
   // Optimization, Lineage & Tenant Isolation Indexes
   @@unique([documentId, versionNumber])
@@ -379,4 +382,59 @@ model DocumentVersion {
   @@index([createdById])
   @@index([createdAt(sort: Desc)])
   @@map("document_versions")
+}
+
+// ==========================================
+// DOCUMENT CHUNKING & SOURCE PROVENANCE
+// ==========================================
+
+/// Represents an extracted textual segment of an enterprise document or document version,
+/// maintaining deterministic chunk ordering, line-level source provenance coordinates
+/// (PDF page, DOCX section, XLSX worksheet & rows, character offsets), content hashing,
+/// token metrics, vector store point references, and zero-trust multi-tenant isolation.
+/// Character offset convention: 0-indexed, half-open interval [charStart, charEnd)
+/// representing the exact character slice within the source text stream where charStart <= charEnd.
+model DocumentChunk {
+  id                String  @id @default(uuid()) @db.Uuid
+  tenantId          String  @map("tenant_id") @db.Uuid
+  documentId        String  @map("document_id") @db.Uuid
+  documentVersionId String? @map("document_version_id") @db.Uuid
+  chunkIndex        Int     @map("chunk_index")
+  content           String  @db.Text
+  contentHash       String  @map("content_hash") @db.VarChar(64)
+  tokenCount        Int     @map("token_count")
+  embeddingId       String? @map("embedding_id") @db.VarChar(255)
+  vectorStorageId   String? @map("vector_storage_id") @db.VarChar(255)
+  metadata          Json?   @default("{}")
+
+  // Source Lineage Coordinates (Nullable for format-specific provenance)
+  pageNumber     Int?    @map("page_number")
+  sectionHeading String? @map("section_heading") @db.Text
+  sheetName      String? @map("sheet_name") @db.VarChar(255)
+  rowRange       String? @map("row_range") @db.VarChar(100)
+  charStart      Int?    @map("char_start")
+  charEnd        Int?    @map("char_end")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  // Relationships
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  document        Document         @relation("DocumentToChunks", fields: [documentId], references: [id], onDelete: Cascade)
+  documentVersion DocumentVersion? @relation("DocumentVersionToChunks", fields: [documentVersionId], references: [id], onDelete: Cascade)
+
+  // Optimization, Lineage & Retrieval Indexes
+  @@index([documentId, chunkIndex])
+  @@index([documentVersionId, chunkIndex])
+  @@index([tenantId])
+  @@index([tenantId, documentId])
+  @@index([tenantId, documentVersionId])
+  @@index([documentId, pageNumber])
+  @@index([documentId, sectionHeading])
+  @@index([documentId, sheetName])
+  @@index([contentHash])
+  @@index([embeddingId])
+  @@index([vectorStorageId])
+  @@index([createdAt(sort: Desc)])
+  @@map("document_chunks")
 }

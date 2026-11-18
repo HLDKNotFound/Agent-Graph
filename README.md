@@ -182,5 +182,3 @@ For complete, granular specifications, explore the dedicated documentation suite
 - **Task Queue & Cache:** Celery, Redis
 - **Models:** `BAAI/bge-m3` (Embedding), `BAAI/bge-reranker-v2-m3` (Reranking), Local / API LLM
 - **Observability:** Langfuse, Prometheus, Grafana, OpenTelemetry
-# agent-graph-
-# agent-graph-
