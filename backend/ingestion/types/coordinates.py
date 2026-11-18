@@ -67,6 +67,17 @@ class BoundingBox(BaseModel):
             raise ValueError(f"Invalid bounding box: y0 ({self.y0}) cannot exceed y1 ({self.y1})")
         return self
 
+    @property
+    def width(self) -> float:
+        """Return the horizontal width of the bounding box."""
+        return self.x1 - self.x0
+
+    @property
+    def height(self) -> float:
+        """Return the vertical height of the bounding box."""
+        return self.y1 - self.y0
+
+
 
 class ChunkLocator(BaseModel):
     """Source provenance and locator coordinates for verifiable citation and auditability.

@@ -21,6 +21,7 @@ from typing import Any, BinaryIO
 
 import pymupdf
 
+from backend.ingestion.config import get_ingestion_settings
 from backend.ingestion.exceptions import (
     CorruptDocumentError,
     EmptyFileError,
@@ -29,6 +30,12 @@ from backend.ingestion.exceptions import (
     UnsupportedDocumentTypeError,
 )
 from backend.ingestion.extraction.base import DocumentExtractor
+from backend.ingestion.extraction.ocr import (
+    ScannedPageDetector,
+    get_ocr_engine,
+    render_pdf_page_to_image,
+    sort_and_classify_ocr_blocks,
+)
 from backend.ingestion.extraction.registry import register_extractor
 from backend.ingestion.types.context import IngestionContext
 from backend.ingestion.types.coordinates import BoundingBox, ChunkLocator
@@ -66,17 +73,38 @@ class NativePDFExtractor(DocumentExtractor):
 
     def __init__(
         self,
-        scanned_threshold_chars: int = 50,
+        scanned_threshold_chars: int | None = None,
         heading_size_ratio: float = 1.15,
+        enable_ocr: bool = False,
+        ocr_dpi: int | None = None,
+        ocr_engine: str | None = None,
+        ocr_languages: str | None = None,
     ) -> None:
         """Initialize NativePDFExtractor.
 
         Args:
             scanned_threshold_chars: Minimum character count below which a page is flagged as potential scanned.
             heading_size_ratio: Ratio above body font size required to identify a heading.
+            enable_ocr: Whether to execute OCR on detected scanned pages (default: False).
+            ocr_dpi: DPI resolution for PDF page image rasterization (default from settings: 300).
+            ocr_engine: Specific OCR engine name ('rapidocr' or 'tesseract').
+            ocr_languages: OCR language identifier (e.g. 'eng+vie').
         """
-        self.scanned_threshold_chars = scanned_threshold_chars
+        settings = get_ingestion_settings()
+        self.scanned_threshold_chars = (
+            scanned_threshold_chars
+            if scanned_threshold_chars is not None
+            else settings.ocr_scanned_char_threshold
+        )
         self.heading_size_ratio = heading_size_ratio
+        self.enable_ocr = enable_ocr
+        self.ocr_dpi = ocr_dpi if ocr_dpi is not None else settings.ocr_dpi
+        self.ocr_engine = ocr_engine or settings.ocr_engine
+        self.ocr_languages = ocr_languages or settings.ocr_languages
+        self._detector = ScannedPageDetector(
+            scanned_threshold_chars=self.scanned_threshold_chars,
+            image_coverage_threshold=settings.ocr_image_coverage_threshold,
+        )
 
     @property
     def name(self) -> str:
@@ -138,7 +166,9 @@ class NativePDFExtractor(DocumentExtractor):
             elements: list[ExtractedElement] = []
             warnings: list[str] = []
             potential_scanned_pages: list[int] = []
+            ocr_pages: list[int] = []
             current_section_heading: str | None = None
+            effective_enable_ocr = self.enable_ocr or context.options.enable_ocr
 
             # Process document page by page
             for page_idx in range(doc.page_count):
@@ -154,14 +184,77 @@ class NativePDFExtractor(DocumentExtractor):
 
                 if is_scanned_page:
                     potential_scanned_pages.append(page_num)
-                    warning_msg = (
-                        f"Page {page_num}: Little or no extractable text detected ({char_count} chars). "
-                        "Flagged as potential scanned or image-only page requiring OCR."
-                    )
-                    warnings.append(warning_msg)
-                    logger.warning(warning_msg)
 
-                if next_heading:
+                    if effective_enable_ocr:
+                        # Apply OCR only to pages that require it
+                        try:
+                            engine = get_ocr_engine(
+                                engine_name=self.ocr_engine,
+                                languages=self.ocr_languages,
+                            )
+                            # Render PDF page to image with configurable DPI
+                            img_array, scale_x, scale_y = render_pdf_page_to_image(
+                                page=page,
+                                dpi=self.ocr_dpi,
+                            )
+                            # Run offline OCR inference
+                            ocr_blocks = engine.extract_text(
+                                image=img_array,
+                                page_num=page_num,
+                                scale_x=scale_x,
+                                scale_y=scale_y,
+                            )
+                            if ocr_blocks:
+                                ocr_elements, next_ocr_heading = sort_and_classify_ocr_blocks(
+                                    blocks=ocr_blocks,
+                                    page_num=page_num,
+                                    current_heading=current_section_heading,
+                                    page_width=page.rect.width,
+                                    page_height=page.rect.height,
+                                    engine_name=engine.name,
+                                )
+                                if next_ocr_heading:
+                                    current_section_heading = next_ocr_heading
+                                page_elements = ocr_elements
+                                ocr_pages.append(page_num)
+                        except Exception as ocr_err:
+                            # Handle OCR failures on individual pages without failing entire document
+                            warning_msg = f"Page {page_num}: OCR extraction failed: {ocr_err}"
+                            warnings.append(warning_msg)
+                            logger.warning(warning_msg, exc_info=True)
+                            fallback_elem = PageElement(
+                                page_number=page_num,
+                                width=page.rect.width,
+                                height=page.rect.height,
+                                is_scanned=True,
+                                content=f"[Scanned Page {page_num}: OCR extraction error: {ocr_err}]",
+                                metadata={
+                                    "potential_scanned": True,
+                                    "ocr_failed": True,
+                                    "error": str(ocr_err),
+                                },
+                                locator=ChunkLocator(
+                                    page_number=page_num,
+                                    section_heading=current_section_heading,
+                                    bounding_box=BoundingBox(
+                                        x0=0.0,
+                                        y0=0.0,
+                                        x1=page.rect.width,
+                                        y1=page.rect.height,
+                                        page_number=page_num,
+                                    ),
+                                ),
+                            )
+                            page_elements = [fallback_elem]
+                    else:
+                        warning_msg = (
+                            f"Page {page_num}: Little or no extractable text detected ({char_count} chars). "
+                            "Flagged as potential scanned or image-only page requiring OCR."
+                        )
+                        warnings.append(warning_msg)
+                        logger.warning(warning_msg)
+
+                if next_heading and not (is_scanned_page and effective_enable_ocr and ocr_pages and ocr_pages[-1] == page_num):
                     current_section_heading = next_heading
 
                 elements.extend(page_elements)
@@ -174,6 +267,7 @@ class NativePDFExtractor(DocumentExtractor):
                 metadata=metadata,
                 source_filename=source_filename,
                 potential_scanned_pages=potential_scanned_pages,
+                ocr_pages=ocr_pages,
             )
 
             # Compute execution telemetry
@@ -185,7 +279,7 @@ class NativePDFExtractor(DocumentExtractor):
                 total_pages=doc.page_count,
                 total_elements=len(elements),
                 total_characters=sum(len(e.text_content) for e in elements),
-                ocr_applied=False,
+                ocr_applied=len(ocr_pages) > 0,
             )
 
             result = ExtractionResult(
@@ -312,8 +406,12 @@ class NativePDFExtractor(DocumentExtractor):
                     b["_clean_lines"] = block_text_parts
                     text_blocks.append(b)
 
-        # 4. Check for scanned / image-only page
-        is_scanned = total_page_chars < self.scanned_threshold_chars
+        # 4. Check for scanned / image-only page using ScannedPageDetector
+        is_scanned, scan_reason, scan_metrics = self._detector.detect(
+            page=page,
+            digital_char_count=total_page_chars,
+            has_tables=bool(tables),
+        )
 
         # If page has virtually no text, emit PageElement so page is recorded
         if total_page_chars == 0 and not tables:
@@ -704,6 +802,7 @@ class NativePDFExtractor(DocumentExtractor):
         metadata: DocumentMetadata | None,
         source_filename: str,
         potential_scanned_pages: list[int],
+        ocr_pages: list[int] | None = None,
     ) -> DocumentMetadata:
         """Construct normalized DocumentMetadata enriching input metadata with PDF document attributes."""
         raw_meta = doc.metadata or {}
@@ -732,6 +831,8 @@ class NativePDFExtractor(DocumentExtractor):
                 "mod_date": raw_meta.get("modDate"),
                 "potential_scanned_pages": potential_scanned_pages,
                 "has_scanned_pages": len(potential_scanned_pages) > 0,
+                "ocr_pages": ocr_pages or [],
+                "ocr_applied": bool(ocr_pages),
             }
         )
 
@@ -768,3 +869,40 @@ class NativePDFExtractor(DocumentExtractor):
             custom_metadata=custom_attrs,
             custom_attributes=custom_attrs,
         )
+
+
+@register_extractor()
+class ScannedPDFExtractor(NativePDFExtractor):
+    """Adaptive and OCR-capable PDF extractor supporting both native digital and scanned PDF pages.
+
+    Reuses the PDF extraction interface from Task 04. Automatically detects scanned and
+    image-only pages, rasterizes them at configurable DPI, runs offline OCR (RapidOCR or Tesseract),
+    and preserves line-level provenance coordinates, confidence metrics, and reading order.
+    """
+
+    def __init__(
+        self,
+        scanned_threshold_chars: int | None = None,
+        heading_size_ratio: float = 1.15,
+        ocr_dpi: int | None = None,
+        ocr_engine: str | None = None,
+        ocr_languages: str | None = None,
+    ) -> None:
+        """Initialize ScannedPDFExtractor with OCR enabled by default."""
+        super().__init__(
+            scanned_threshold_chars=scanned_threshold_chars,
+            heading_size_ratio=heading_size_ratio,
+            enable_ocr=True,
+            ocr_dpi=ocr_dpi,
+            ocr_engine=ocr_engine,
+            ocr_languages=ocr_languages,
+        )
+
+    @property
+    def name(self) -> str:
+        return "ScannedPDFExtractor"
+
+    @property
+    def supports_ocr(self) -> bool:
+        return True
+

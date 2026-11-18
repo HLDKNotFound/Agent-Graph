@@ -85,6 +85,45 @@ class IngestionSettings(BaseSettings):
         description="List of allowed document MIME content types",
     )
 
+    # ------------------------------------------
+    # OCR & Scanned Document Configuration
+    # ------------------------------------------
+    ocr_enabled: bool = Field(
+        default=True,
+        alias="OCR_ENABLED",
+        description="Global toggle for OCR extraction capability on scanned pages",
+    )
+    ocr_engine: str = Field(
+        default="rapidocr",
+        alias="OCR_ENGINE",
+        description="Default OCR engine implementation ('rapidocr' or 'tesseract')",
+    )
+    ocr_dpi: int = Field(
+        default=300,
+        alias="OCR_DPI",
+        description="Rendering DPI for PDF rasterization during OCR (e.g. 150, 200, 300)",
+    )
+    ocr_languages: str = Field(
+        default="eng+vie",
+        alias="OCR_LANGUAGES",
+        description="Target OCR language codes (e.g. 'eng+vie' for English and Vietnamese)",
+    )
+    ocr_scanned_char_threshold: int = Field(
+        default=50,
+        alias="OCR_SCANNED_CHAR_THRESHOLD",
+        description="Character count threshold below which a page is inspected for scanned image content",
+    )
+    ocr_image_coverage_threshold: float = Field(
+        default=0.4,
+        alias="OCR_IMAGE_COVERAGE_THRESHOLD",
+        description="Image-to-page surface area ratio to classify a low-text page as scanned",
+    )
+    ocr_min_confidence: float = Field(
+        default=0.3,
+        alias="OCR_MIN_CONFIDENCE",
+        description="Minimum confidence score threshold for recognized text blocks (0.0 to 1.0)",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_ingestion_settings() -> IngestionSettings:
