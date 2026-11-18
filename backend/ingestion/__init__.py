@@ -34,11 +34,13 @@ from backend.ingestion.exceptions import (
     ValidationError,
 )
 from backend.ingestion.extraction import (
+    DocxExtractor,
     DocumentExtractor,
     ExtractorRegistry,
     NativePDFExtractor,
     OCRBlock,
     OCREngine,
+    OpenXMLDocxExtractor,
     RapidOCREngine,
     ScannedPageDetector,
     ScannedPDFExtractor,
@@ -114,6 +116,8 @@ __all__ = [
     "DocumentExtractor",
     "NativePDFExtractor",
     "ScannedPDFExtractor",
+    "DocxExtractor",
+    "OpenXMLDocxExtractor",
     "ExtractorRegistry",
     "default_extractor_registry",
     "register_extractor",

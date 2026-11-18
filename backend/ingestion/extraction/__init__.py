@@ -1,6 +1,10 @@
 """Extraction subsystem contracts and extractor registry."""
 
 from backend.ingestion.extraction.base import DocumentExtractor
+from backend.ingestion.extraction.docx import (
+    DocxExtractor,
+    OpenXMLDocxExtractor,
+)
 from backend.ingestion.extraction.ocr import (
     OCRBlock,
     OCREngine,
@@ -25,6 +29,8 @@ __all__ = [
     "DocumentExtractor",
     "NativePDFExtractor",
     "ScannedPDFExtractor",
+    "DocxExtractor",
+    "OpenXMLDocxExtractor",
     "ExtractorRegistry",
     "default_extractor_registry",
     "register_extractor",
@@ -37,4 +43,5 @@ __all__ = [
     "render_pdf_page_to_image",
     "sort_and_classify_ocr_blocks",
 ]
+
 
