@@ -1,0 +1,162 @@
+# ==========================================
+# Environment Variables & Secrets (NEVER COMMIT)
+# ==========================================
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+credentials.json
+client_secret*.json
+service_account*.json
+token.json
+session_store/
+
+# ==========================================
+# Python & FastAPI Backend
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Testing, Coverage & Quality Tools
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+.mypy_cache/
+.pytype/
+.ruff_cache/
+
+# ==========================================
+# Node.js & Next.js Frontend
+# ==========================================
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+.pnp
+.pnp.js
+
+# Next.js Build Output
+.next/
+out/
+
+# Turbo
+.turbo
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# ==========================================
+# Database & Vector Store Local Volumes
+# ==========================================
+*.sqlite
+*.sqlite3
+*.db
+postgres_data/
+qdrant_storage/
+redis_data/
+minio_data/
+
+# ==========================================
+# Document Ingestion & Storage Local Uploads
+# ==========================================
+uploads/
+raw_documents/
+parsed_cache/
+extracted_tables/
+ocr_temp/
+storage/
+temp/
+tmp/
+
+# ==========================================
+# Telemetry, Evaluation & Benchmark Artifacts
+# ==========================================
+*.log
+logs/
+benchmark_runs/
+evaluation_results/
+reports/
+langfuse_exports/
+wandb/
+
+# ==========================================
+# Backups, Caches & Temporary Files
+# ==========================================
+*.bak
+*.bak.*
+*.old
+*.orig
+*~
+*.swp
+*.swo
+
+# ==========================================
+# Operating System & IDE Artifacts
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# JetBrains IDEs
+.idea/
+*.iws
+*.iml
+
+# VS Code / Cursor
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
