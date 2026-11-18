@@ -143,6 +143,30 @@ class IngestionSettings(BaseSettings):
         description="Minimum confidence score threshold for recognized text blocks (0.0 to 1.0)",
     )
 
+    # ------------------------------------------
+    # Relational Database & Deduplication Settings
+    # ------------------------------------------
+    database_url: str = Field(
+        default="postgresql://postgres:password@localhost:5432/agentgraph_db?schema=public",
+        alias="DATABASE_URL",
+        description="PostgreSQL connection string for relational storage and document deduplication",
+    )
+    direct_url: str | None = Field(
+        default=None,
+        alias="DIRECT_URL",
+        description="Direct PostgreSQL connection string bypassing transaction poolers",
+    )
+    deduplication_chunk_size_bytes: int = Field(
+        default=65_536,  # 64 KB
+        alias="DEDUPLICATION_CHUNK_SIZE_BYTES",
+        description="Buffer size in bytes for streaming SHA-256 hash calculation",
+    )
+    deduplication_default_policy: str = Field(
+        default="RETURN_EXISTING",
+        alias="DEDUPLICATION_DEFAULT_POLICY",
+        description="Default handling policy when duplicate document is encountered ('RETURN_EXISTING', 'REJECT', 'NEW_VERSION')",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_ingestion_settings() -> IngestionSettings:

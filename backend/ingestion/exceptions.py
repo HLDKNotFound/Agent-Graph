@@ -111,6 +111,35 @@ class DeduplicationError(IngestionError):
     pass
 
 
+class DuplicateDocumentError(DeduplicationError):
+    """Raised when an identical active document is detected and policy prohibits ingestion."""
+
+    def __init__(
+        self,
+        message: str,
+        tenant_id: str | None = None,
+        content_hash: str | None = None,
+        existing_document_id: str | None = None,
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        merged_details = dict(details or {})
+        if tenant_id:
+            merged_details["tenant_id"] = tenant_id
+        if content_hash:
+            merged_details["content_hash"] = content_hash
+        if existing_document_id:
+            merged_details["existing_document_id"] = existing_document_id
+        super().__init__(message, details=merged_details)
+        self.tenant_id = tenant_id
+        self.content_hash = content_hash
+        self.existing_document_id = existing_document_id
+
+
+class ConcurrentDuplicateError(DuplicateDocumentError):
+    """Raised when concurrent upload collisions occur on identical active document hashes."""
+    pass
+
+
 class EmbeddingError(IngestionError):
     """Raised when embedding generation fails."""
     pass

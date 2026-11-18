@@ -34,6 +34,10 @@ class IngestionOptions(BaseModel):
         default=True,
         description="Enable pre-ingestion SHA-256 and chunk MinHash LSH deduplication",
     )
+    duplicate_handling_policy: str = Field(
+        default="RETURN_EXISTING",
+        description="Duplicate handling strategy: 'RETURN_EXISTING', 'REJECT', or 'NEW_VERSION'",
+    )
     minhash_similarity_threshold: float = Field(
         default=0.92,
         ge=0.0,

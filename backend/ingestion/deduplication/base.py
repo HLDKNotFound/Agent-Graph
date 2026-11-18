@@ -8,21 +8,44 @@ from backend.ingestion.types.chunking import DocumentChunkInput
 from backend.ingestion.types.context import IngestionContext
 
 
+from backend.ingestion.deduplication.models import (
+    DuplicateAction,
+    DuplicateHandlingPolicy,
+    ExistingDocumentSummary,
+)
+
+
 class DeduplicationResult(BaseModel):
     """Outcome report for document-level or chunk-level deduplication analysis."""
 
     model_config = ConfigDict(frozen=True)
 
     is_duplicate: bool = Field(..., description="Whether duplicate was detected")
+    action: DuplicateAction = Field(
+        default=DuplicateAction.PROCEED,
+        description="Action taken by the deduplication engine (PROCEED, RETURN_EXISTING, REJECTED, NEW_VERSION_CREATED)",
+    )
     similarity_score: float = Field(
         default=0.0,
         ge=0.0,
         le=1.0,
         description="Calculated similarity metric (1.0 for exact SHA-256 match, Jaccard for MinHash)",
     )
+    content_hash: str | None = Field(
+        default=None,
+        description="Calculated SHA-256 hexadecimal hash",
+    )
+    file_size_bytes: int | None = Field(
+        default=None,
+        description="Calculated file size in bytes from streaming read",
+    )
     existing_document_id: str | None = Field(
         default=None,
         description="UUID of existing document if exact match found in database",
+    )
+    existing_document: ExistingDocumentSummary | None = Field(
+        default=None,
+        description="Full summary snapshot of existing document if active duplicate detected",
     )
     existing_chunk_id: str | None = Field(
         default=None,
