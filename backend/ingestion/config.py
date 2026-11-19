@@ -167,6 +167,55 @@ class IngestionSettings(BaseSettings):
         description="Default handling policy when duplicate document is encountered ('RETURN_EXISTING', 'REJECT', 'NEW_VERSION')",
     )
 
+    # ------------------------------------------
+    # MinHash LSH Near-Duplicate Chunk Settings
+    # ------------------------------------------
+    minhash_enabled: bool = Field(
+        default=True,
+        alias="MINHASH_ENABLED",
+        description="Global toggle for chunk-level MinHash LSH near-duplicate detection",
+    )
+    minhash_shingle_size: int = Field(
+        default=3,
+        alias="MINHASH_SHINGLE_SIZE",
+        description="N-gram shingle size for MinHash signature calculation (default: 3)",
+    )
+    minhash_num_permutations: int = Field(
+        default=128,
+        alias="MINHASH_NUM_PERMUTATIONS",
+        description="Number of permutation hash functions for MinHash signature (default: 128)",
+    )
+    minhash_similarity_threshold: float = Field(
+        default=0.92,
+        alias="MINHASH_SIMILARITY_THRESHOLD",
+        description="Jaccard similarity threshold for near-duplicate chunk detection (default: 0.92)",
+    )
+    minhash_exact_threshold: float = Field(
+        default=0.999,
+        alias="MINHASH_EXACT_THRESHOLD",
+        description="Threshold above which chunk is classified as an exact duplicate (default: 0.999)",
+    )
+    minhash_ngram_type: str = Field(
+        default="word",
+        alias="MINHASH_NGRAM_TYPE",
+        description="Shingle segmentation tokenization type ('word' or 'character')",
+    )
+    minhash_lsh_bands: int | None = Field(
+        default=None,
+        alias="MINHASH_LSH_BANDS",
+        description="Number of bands for LSH partitioning. If None, computed from threshold and permutations",
+    )
+    minhash_lsh_rows: int | None = Field(
+        default=None,
+        alias="MINHASH_LSH_ROWS",
+        description="Number of rows per band for LSH partitioning",
+    )
+    minhash_seed: int = Field(
+        default=42,
+        alias="MINHASH_SEED",
+        description="Deterministic PRNG seed for universal permutation generation",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_ingestion_settings() -> IngestionSettings:

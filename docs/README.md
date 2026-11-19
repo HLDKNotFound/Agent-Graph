@@ -37,12 +37,21 @@ docs/
     │   ├── task_05_enterprise_audit_logging.md
     │   ├── task_06_document_metadata_classification.md
     │   ├── task_07_document_versioning_historical_lineage.md
+    │   ├── task_08_document_chunking_source_provenance.md
     │   ├── task_09_postgresql_full_text_search_infrastructure.md
     │   └── task_10_database_security_performance_optimization.md
-    └── phase_2/                   # Phase 2: Ingestion & Indexing Pipeline (Tasks 01–05)
+    └── phase_2/                   # Phase 2: Ingestion & Indexing Pipeline (Tasks 01–11)
         ├── task_01_ingestion_architecture_and_shared_interfaces.md
         ├── task_02_file_validation_and_storage_abstraction.md
-        └── task_03_extraction_result_models_and_locator_contracts.md
+        ├── task_03_extraction_result_models_and_locator_contracts.md
+        ├── task_04_native_pdf_text_extraction.md
+        ├── task_05_scanned_pdf_detection_and_ocr_extraction.md
+        ├── task_06_microsoft_word_docx_extraction.md
+        ├── task_07_xlsx_and_csv_structured_extraction.md
+        ├── task_08_sha256_exact_document_deduplication.md
+        ├── task_09_structure_aware_chunking_engine.md
+        ├── task_10_chunk_provenance_and_locator_validation.md
+        └── task_11_minhash_lsh_near_duplicate_chunk_detection.md
 ```
 
 ---
@@ -95,6 +104,7 @@ Detailed task completion reports tracking implementation progress across Phase 1
 | 📜 [**Task 05: Enterprise Audit Logging**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_05_enterprise_audit_logging.md) | Compliance & Audit | Immutable AuditLog model, structured JSON metadata, retention policies |
 | 📄 [**Task 06: Document Metadata & Classification**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_06_document_metadata_classification.md) | Document Management | Core Document model, classification enums, tenant-aware SHA-256 deduplication |
 | 🗃️ [**Task 07: Document Versioning & Lineage**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_07_document_versioning_historical_lineage.md) | Version Control | DocumentVersion model, version sequencing, dual current-version identification |
+| 🧩 [**Task 08: Document Chunking & Source Provenance**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_08_document_chunking_source_provenance.md) | Chunk & Provenance Persistence | `DocumentChunk` model, PDF/DOCX/XLSX locator coordinates, half-open interval `[charStart, charEnd)`, cross-tenant triggers |
 | 🔍 [**Task 09: Full-Text Search Infrastructure**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_09_postgresql_full_text_search_infrastructure.md) | Lexical Search | GIN index on `to_tsvector('simple', content)`, websearch query parsing, RBAC filtering |
 | 🚀 [**Task 10: Security & Performance Optimization**](file:///home/mercury/AgentGraph/docs/phases/phase_1/task_10_database_security_performance_optimization.md) | Hardening & Benchmarking | RLS multi-tenant policies, partial indexing, duplicate GIN removal, clean DB validation |
 
@@ -108,6 +118,14 @@ Detailed task completion reports tracking implementation progress across Phase 2
 | 🏗️ [**Task 01: Ingestion Architecture & Shared Interfaces**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_01_ingestion_architecture_and_shared_interfaces.md) | Ingestion Foundation | Subsystem architecture, Pydantic v2 data contracts, ChunkLocator provenance, ExtractorRegistry |
 | 🛡️ [**Task 02: File Validation & Storage Abstraction**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_02_file_validation_and_storage_abstraction.md) | Security & Storage | Magic byte detection (PDF, DOCX, XLSX, CSV), path traversal defenses, Local/S3 storage drivers, tenant isolation |
 | 📐 [**Task 03: Extraction Result Models & Locator Contracts**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_03_extraction_result_models_and_locator_contracts.md) | Ingestion Foundation | NormalizedElement contract, 1-based coordinates, GFM markdown serialization, canonical text offsets, source traceability |
+| 📄 [**Task 04: Native PDF Text Extraction**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_04_native_pdf_text_extraction.md) | Document Parsing | Native PDF text streaming, font size heading hierarchy, PyMuPDF / pdfplumber fallback, coordinate tracking |
+| 🔍 [**Task 05: Scanned PDF Detection & OCR Extraction**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_05_scanned_pdf_detection_and_ocr_extraction.md) | OCR & Image Parsing | Heuristic scanned page detection, RapidOCR / Tesseract integration, bounding box text extraction, dual-engine fallback |
+| 📝 [**Task 06: Microsoft Word DOCX Extraction**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_06_microsoft_word_docx_extraction.md) | Word Document Parsing | OpenXML DOM traversal, hierarchical headings (Heading 1-6), bullet lists, table extraction, document metadata |
+| 📊 [**Task 07: XLSX & CSV Structured Extraction**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_07_xlsx_and_csv_structured_extraction.md) | Tabular Data Extraction | Worksheet parsing, row/column coordinate preservation, markdown table serialization, streaming large spreadsheet mode |
+| 🔐 [**Task 08: SHA-256 Exact Document Deduplication**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_08_sha256_exact_document_deduplication.md) | Pre-Ingestion Deduplication | Bounded 64KB streaming SHA-256 calculation, stream rewind, tenant isolation, soft-deletion awareness, race-safe policies |
+| 🧩 [**Task 09: Structure-Aware Chunking Engine**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_09_structure_aware_chunking_engine.md) | Structural Segmentation | Recursive structural chunker with heading inheritance, sliding window with 10% overlap, semantic table-aware chunker |
+| 📍 [**Task 10: Chunk Provenance & Locator Validation**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_10_chunk_provenance_and_locator_validation.md) | Provenance Verification | Format-aware locator coordinate validator, physical boundary verification, [charStart, charEnd) intervals, citation badges |
+| ⚡ [**Task 11: MinHash LSH Near-Duplicate Chunk Detection**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_11_minhash_lsh_near_duplicate_chunk_detection.md) | Near-Duplicate Detection | Vectorized MinHash (128 permutations), optimal LSH candidate buckets, exact vs near-duplicate discrimination, version scope |
 
 ---
 

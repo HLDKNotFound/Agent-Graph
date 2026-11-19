@@ -25,6 +25,10 @@ from backend.ingestion.deduplication.repository import (
     InMemoryDocumentRepository,
     PostgresDocumentRepository,
 )
+from backend.ingestion.deduplication.chunk_deduplicator import (
+    MinHashChunkDeduplicator,
+    get_chunk_deduplicator,
+)
 from backend.ingestion.exceptions import (
     DuplicateDocumentError,
     EmptyFileError,
@@ -263,8 +267,10 @@ class Sha256ExactDeduplicationStrategy(DeduplicationStrategy):
         self,
         deduplicator: DocumentDeduplicator | None = None,
         repository: DocumentRepository | None = None,
+        chunk_deduplicator: MinHashChunkDeduplicator | None = None,
     ) -> None:
         self.deduplicator = deduplicator or DocumentDeduplicator(repository=repository)
+        self.chunk_deduplicator = chunk_deduplicator or get_chunk_deduplicator()
 
     @property
     def name(self) -> str:
@@ -287,9 +293,10 @@ class Sha256ExactDeduplicationStrategy(DeduplicationStrategy):
         chunks: list[DocumentChunkInput],
         context: IngestionContext,
     ) -> list[DocumentChunkInput]:
-        """Near-duplicate chunk filtering contract (reserved for MinHash LSH task)."""
-        # In Task 08, chunk filtering passes through until MinHash LSH is implemented
-        return chunks
+        """Near-duplicate chunk detection and non-destructive metadata annotation using MinHash LSH."""
+        if context.options and not context.options.deduplication_enabled:
+            return chunks
+        return self.chunk_deduplicator.annotate_chunks(chunks, context=context)
 
     async def deduplicate_content(
         self,
@@ -309,3 +316,41 @@ class Sha256ExactDeduplicationStrategy(DeduplicationStrategy):
             rewind_after=rewind_after,
             raise_on_duplicate=raise_on_duplicate,
         )
+
+
+class MinHashDeduplicationStrategy(DeduplicationStrategy):
+    """Chunk-level deduplication strategy employing MinHash signatures and LSH indexing."""
+
+    def __init__(
+        self,
+        chunk_deduplicator: MinHashChunkDeduplicator | None = None,
+        deduplicator: DocumentDeduplicator | None = None,
+    ) -> None:
+        self.chunk_deduplicator = chunk_deduplicator or get_chunk_deduplicator()
+        self.deduplicator = deduplicator or DocumentDeduplicator()
+
+    @property
+    def name(self) -> str:
+        return "MinHashLshDeduplication"
+
+    async def check_document_duplicate(
+        self,
+        file_hash_sha256: str,
+        context: IngestionContext,
+    ) -> DeduplicationResult:
+        """Check for exact document-level duplicate before chunking."""
+        return await self.deduplicator.check_hash(
+            content_hash=file_hash_sha256,
+            context=context,
+            raise_on_duplicate=False,
+        )
+
+    async def filter_duplicate_chunks(
+        self,
+        chunks: list[DocumentChunkInput],
+        context: IngestionContext,
+    ) -> list[DocumentChunkInput]:
+        """Annotate chunks with near-duplicate information using MinHash LSH without dropping chunks."""
+        if context.options and not context.options.deduplication_enabled:
+            return chunks
+        return self.chunk_deduplicator.annotate_chunks(chunks, context=context)
