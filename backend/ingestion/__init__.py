@@ -113,7 +113,17 @@ from backend.ingestion.extraction import (
     register_extractor,
     render_pdf_page_to_image,
 )
-from backend.ingestion.indexing import VectorIndexProvider, VectorIndexResult
+from backend.ingestion.indexing import (
+    QdrantBatchIndexResult,
+    QdrantConfig,
+    QdrantPointRecord,
+    QdrantVectorIndexService,
+    VectorIndexProvider,
+    VectorIndexResult,
+    get_qdrant_index_service,
+    serialize_chunk_payload,
+    to_point_id,
+)
 from backend.ingestion.orchestration import (
     IngestionOrchestrator,
     IngestionPipelineResult,
@@ -265,6 +275,13 @@ __all__ = [
     "resolve_device",
     "VectorIndexProvider",
     "VectorIndexResult",
+    "QdrantVectorIndexService",
+    "QdrantConfig",
+    "QdrantPointRecord",
+    "QdrantBatchIndexResult",
+    "get_qdrant_index_service",
+    "serialize_chunk_payload",
+    "to_point_id",
     "IngestionOrchestrator",
     "IngestionPipelineResult",
     # Storage Subsystem

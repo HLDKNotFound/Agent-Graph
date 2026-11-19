@@ -250,6 +250,60 @@ class IngestionSettings(BaseSettings):
         description="Whether to L2-normalize dense embeddings to unit length (default: True)",
     )
 
+    # ------------------------------------------
+    # Vector Database (Qdrant) Settings
+    # ------------------------------------------
+    qdrant_host: str = Field(
+        default="localhost",
+        alias="QDRANT_HOST",
+        description="Qdrant service hostname or IP",
+    )
+    qdrant_port: int = Field(
+        default=6333,
+        alias="QDRANT_PORT",
+        description="Qdrant HTTP REST API port",
+    )
+    qdrant_grpc_port: int = Field(
+        default=6334,
+        alias="QDRANT_GRPC_PORT",
+        description="Qdrant gRPC port",
+    )
+    qdrant_api_key: str | None = Field(
+        default=None,
+        alias="QDRANT_API_KEY",
+        description="API key for authenticated Qdrant access",
+    )
+    qdrant_url: str | None = Field(
+        default=None,
+        alias="QDRANT_URL",
+        description="Full Qdrant endpoint URL override (e.g. cloud URL or ':memory:')",
+    )
+    qdrant_collection: str = Field(
+        default="enterprise_knowledge_chunks",
+        alias="QDRANT_COLLECTION",
+        description="Default Qdrant collection name for knowledge chunks",
+    )
+    qdrant_hnsw_m: int = Field(
+        default=16,
+        alias="QDRANT_HNSW_M",
+        description="Number of bidirectional edges per HNSW node (default: 16)",
+    )
+    qdrant_hnsw_ef_construct: int = Field(
+        default=128,
+        alias="QDRANT_HNSW_EF_CONSTRUCT",
+        description="Size of dynamic candidate list during HNSW construction (default: 128)",
+    )
+    qdrant_hnsw_ef: int = Field(
+        default=64,
+        alias="QDRANT_HNSW_EF",
+        description="Size of dynamic candidate list during query time (default: 64)",
+    )
+    qdrant_prefer_grpc: bool = Field(
+        default=False,
+        alias="QDRANT_PREFER_GRPC",
+        description="Whether to prefer gRPC over HTTP for vector operations",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_ingestion_settings() -> IngestionSettings:
