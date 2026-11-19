@@ -1,0 +1,202 @@
+{
+  "timestamp": "2026-11-19T11:06:37.948178+00:00",
+  "pdf_extraction_throughput": [
+    {
+      "page_count": 10,
+      "file_size_kb": 22.87,
+      "duration_seconds": 2.3285,
+      "pages_per_minute": 257.68,
+      "elements_extracted": 80,
+      "meets_target_50_ppm": true
+    },
+    {
+      "page_count": 50,
+      "file_size_kb": 113.33,
+      "duration_seconds": 10.5341,
+      "pages_per_minute": 284.79,
+      "elements_extracted": 400,
+      "meets_target_50_ppm": true
+    },
+    {
+      "page_count": 100,
+      "file_size_kb": 226.41,
+      "duration_seconds": 21.5461,
+      "pages_per_minute": 278.47,
+      "elements_extracted": 800,
+      "meets_target_50_ppm": true
+    }
+  ],
+  "heterogeneous_e2e_latencies": [
+    {
+      "format_name": "PDF (50 Pages)",
+      "filename": "handbook_50p.pdf",
+      "file_size_kb": 113.33,
+      "status": "COMPLETED",
+      "duration_seconds": 11.3625,
+      "chunks_created": 150,
+      "points_indexed": 150,
+      "metrics": {
+        "job_id": "job-be670f0fb0ad",
+        "document_id": "bench-e2e-handbook_50p.pdf",
+        "tenant_id": "00000000-0000-0000-0000-000000000001",
+        "filename": "handbook_50p.pdf",
+        "file_size_bytes": 116048,
+        "document_type": "",
+        "status": "COMPLETED",
+        "total_duration_seconds": 11.3609,
+        "stage_durations": {
+          "EXTRACTION": 10.6324,
+          "EMBEDDING": 0.0755,
+          "INDEXING": 0.0498
+        },
+        "stages": [],
+        "extracted_page_count": 50,
+        "extracted_element_count": 400,
+        "generated_chunk_count": 0,
+        "tokens_embedded": 6250,
+        "points_indexed": 150,
+        "extraction_duration_seconds": 10.6324,
+        "embedding_duration_seconds": 0.0755,
+        "indexing_duration_seconds": 0.0498,
+        "pages_per_minute": 282.16,
+        "tokens_per_second": 82781.46,
+        "indexing_latency_per_point_ms": 0.332,
+        "retry_count": 0,
+        "error_message": null,
+        "error_stage": null
+      }
+    },
+    {
+      "format_name": "DOCX (10 Sections)",
+      "filename": "governance.docx",
+      "file_size_kb": 36.22,
+      "status": "COMPLETED",
+      "duration_seconds": 0.0876,
+      "chunks_created": 10,
+      "points_indexed": 10,
+      "metrics": {
+        "job_id": "job-4779e955bc49",
+        "document_id": "bench-e2e-governance.docx",
+        "tenant_id": "00000000-0000-0000-0000-000000000001",
+        "filename": "governance.docx",
+        "file_size_bytes": 37088,
+        "document_type": "",
+        "status": "COMPLETED",
+        "total_duration_seconds": 0.0874,
+        "stage_durations": {
+          "EXTRACTION": 0.0706,
+          "EMBEDDING": 0.0052,
+          "INDEXING": 0.0039
+        },
+        "stages": [],
+        "extracted_page_count": 1,
+        "extracted_element_count": 30,
+        "generated_chunk_count": 0,
+        "tokens_embedded": 620,
+        "points_indexed": 10,
+        "extraction_duration_seconds": 0.0706,
+        "embedding_duration_seconds": 0.0052,
+        "indexing_duration_seconds": 0.0039,
+        "pages_per_minute": 849.86,
+        "tokens_per_second": 119230.77,
+        "indexing_latency_per_point_ms": 0.39,
+        "retry_count": 0,
+        "error_message": null,
+        "error_stage": null
+      }
+    },
+    {
+      "format_name": "XLSX (200 Rows)",
+      "filename": "metrics.xlsx",
+      "file_size_kb": 10.81,
+      "status": "COMPLETED",
+      "duration_seconds": 0.1003,
+      "chunks_created": 12,
+      "points_indexed": 12,
+      "metrics": {
+        "job_id": "job-aa3b202a7121",
+        "document_id": "bench-e2e-metrics.xlsx",
+        "tenant_id": "00000000-0000-0000-0000-000000000001",
+        "filename": "metrics.xlsx",
+        "file_size_bytes": 11071,
+        "document_type": "",
+        "status": "COMPLETED",
+        "total_duration_seconds": 0.0999,
+        "stage_durations": {
+          "EXTRACTION": 0.0391,
+          "EMBEDDING": 0.0062,
+          "INDEXING": 0.0046
+        },
+        "stages": [],
+        "extracted_page_count": 1,
+        "extracted_element_count": 201,
+        "generated_chunk_count": 0,
+        "tokens_embedded": 5716,
+        "points_indexed": 12,
+        "extraction_duration_seconds": 0.0391,
+        "embedding_duration_seconds": 0.0062,
+        "indexing_duration_seconds": 0.0046,
+        "pages_per_minute": 1534.53,
+        "tokens_per_second": 921935.48,
+        "indexing_latency_per_point_ms": 0.383,
+        "retry_count": 0,
+        "error_message": null,
+        "error_stage": null
+      }
+    },
+    {
+      "format_name": "CSV (50 Rows)",
+      "filename": "dataset.csv",
+      "file_size_kb": 0.76,
+      "status": "COMPLETED",
+      "duration_seconds": 0.0225,
+      "chunks_created": 2,
+      "points_indexed": 2,
+      "metrics": {
+        "job_id": "job-cd7cb8915c46",
+        "document_id": "bench-e2e-dataset.csv",
+        "tenant_id": "00000000-0000-0000-0000-000000000001",
+        "filename": "dataset.csv",
+        "file_size_bytes": 779,
+        "document_type": "",
+        "status": "COMPLETED",
+        "total_duration_seconds": 0.0223,
+        "stage_durations": {
+          "EXTRACTION": 0.0059,
+          "EMBEDDING": 0.0012,
+          "INDEXING": 0.0023
+        },
+        "stages": [],
+        "extracted_page_count": 1,
+        "extracted_element_count": 51,
+        "generated_chunk_count": 0,
+        "tokens_embedded": 716,
+        "points_indexed": 2,
+        "extraction_duration_seconds": 0.0059,
+        "embedding_duration_seconds": 0.0012,
+        "indexing_duration_seconds": 0.0023,
+        "pages_per_minute": 10169.49,
+        "tokens_per_second": 596666.67,
+        "indexing_latency_per_point_ms": 1.15,
+        "retry_count": 0,
+        "error_message": null,
+        "error_stage": null
+      }
+    }
+  ],
+  "concurrency_performance": {
+    "concurrent_documents": 5,
+    "total_duration_seconds": 10.7466,
+    "documents_per_second": 0.47,
+    "chunks_per_second": 13.96,
+    "all_jobs_completed": true
+  },
+  "memory_profiling": {
+    "test_document": "100-Page Standard Text PDF",
+    "chunks_processed": 300,
+    "points_indexed": 300,
+    "current_memory_mb": 16.1,
+    "peak_memory_mb": 49.91,
+    "memory_bounded": true
+  }
+}

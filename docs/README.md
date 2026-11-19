@@ -55,7 +55,10 @@ docs/
         ├── task_12_bge_m3_dense_embedding_service.md
         ├── task_13_qdrant_vector_indexing_and_payload_management.md
         ├── task_14_celery_redis_asynchronous_workers.md
-        └── task_15_end_to_end_orchestrator_and_cross_storage_consistency.md
+        ├── task_15_end_to_end_orchestrator_and_cross_storage_consistency.md
+        ├── task_16_end_to_end_testing_and_hardening.md
+        ├── task_16_performance_benchmark_report.md
+        └── task_16_failure_injection_report.md
 ```
 
 ---
@@ -134,6 +137,9 @@ Detailed task completion reports tracking implementation progress across Phase 2
 | 🗄️ [**Task 13: Qdrant Vector Indexing & Payload Management**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_13_qdrant_vector_indexing_and_payload_management.md) | Vector Store Persistence | Qdrant v1.8+ integration, 1024-dim Cosine, HNSW (m=16, ef_c=128, ef=64), stable UUID point IDs, zero-trust RBAC payload indexing, tenant isolation |
 | ⚡ [**Task 14: Celery + Redis Asynchronous Workers**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_14_celery_redis_asynchronous_workers.md) | Asynchronous Orchestration | Background worker infrastructure, Celery + Redis, modular tasks (extract/chunk/embed/index/pipeline), idempotency locks, late acks, structured task logs |
 | 🔄 [**Task 15: End-to-End Orchestrator & Cross-Storage Consistency**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_15_end_to_end_orchestrator_and_cross_storage_consistency.md) | End-to-End Orchestration & Consistency | Central orchestrator, 10-stage pipeline, state machine, transactional outbox in PostgreSQL, idempotent Qdrant upserts, saga compensation, cross-storage reconciliation |
+| 🧪 [**Task 16: End-to-End Testing & Hardening**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_16_end_to_end_testing_and_hardening.md) | Quality Gates & Production Hardening | E2E integration test suite, failure injection & compensation verification, 50+ PPM throughput benchmark, zero orphan vectors |
+| 📊 [**Task 16: Performance Benchmark Report**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_16_performance_benchmark_report.md) | Benchmark Measurements | Empirical extraction throughput (257-284 PPM vs 50 target), embedding throughput, tracemalloc peak memory (49.9 MB), concurrency |
+| 🛡️ [**Task 16: Failure Injection Report**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_16_failure_injection_report.md) | Fault Simulation | 10 fault scenarios (extraction, OCR, chunking, embeddings, DB, Qdrant, Redis, worker crash), saga compensation verification |
 
 ---
 

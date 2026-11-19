@@ -86,6 +86,10 @@ from backend.ingestion.orchestration.outbox import (
     OutboxRepository,
     PostgresOutboxRepository,
 )
+from backend.ingestion.observability import (
+    PipelineMetricsCollector,
+    get_pipeline_metrics_collector,
+)
 from backend.ingestion.orchestration.reconciliation import (
     CrossStorageReconciler,
     ReconciliationReport,
@@ -134,9 +138,11 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
         outbox_repo: OutboxRepository | None = None,
         document_repo: DocumentRepository | None = None,
         storage_service: StorageService | None = None,
+        metrics_collector: PipelineMetricsCollector | None = None,
         settings: IngestionSettings | None = None,
     ) -> None:
         self.settings = settings or get_ingestion_settings()
+        self.metrics_collector = metrics_collector or get_pipeline_metrics_collector()
         self.validator = validator or DefaultDocumentValidator(self.settings)
         self.extractor_registry = extractor_registry or default_extractor_registry
         self.chunking_engine = chunking_engine or default_chunking_engine
@@ -236,6 +242,7 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
     ) -> IngestionPipelineResult:
         """Execute end-to-end document ingestion workflow."""
         start_time = time.perf_counter()
+        job_id = f"job-{uuid.uuid4().hex[:12]}"
         tenant_id = context.tenant_id
         document_id = resume_document_id or (context.document_id if context and context.document_id else str(uuid.uuid4()))
 
@@ -251,6 +258,15 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
             file_bytes = self._resolve_bytes(content)
             staged_point_ids: list[str] = []
             storage_path: str | None = None
+
+            # Register job in telemetry collector
+            self.metrics_collector.start_job(
+                job_id=job_id,
+                document_id=document_id,
+                tenant_id=tenant_id,
+                filename=filename,
+                file_size_bytes=len(file_bytes),
+            )
 
             try:
                 # -------------------------------------------------------------
@@ -283,9 +299,15 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                         state_machine.skip_stage(PipelineStage.DEDUPLICATION, reason="Identical active document found")
                         state_machine.complete_pipeline(message=f"Duplicate bypassed; reused document {existing_doc.document_id}")
                         duration = time.perf_counter() - start_time
+                        report = self.metrics_collector.finish_job(
+                            job_id=job_id,
+                            status="COMPLETED",
+                            total_duration_seconds=duration,
+                        )
                         return IngestionPipelineResult(
                             document_id=existing_doc.document_id,
                             tenant_id=tenant_id,
+                            job_id=job_id,
                             status=DocumentIngestionStatus.COMPLETED,
                             final_stage=PipelineStage.DEDUPLICATION,
                             chunks_created=0,
@@ -293,6 +315,7 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                             duration_seconds=round(duration, 4),
                             metadata=None,
                             warnings=[f"Exact duplicate of {existing_doc.document_id}"],
+                            metrics=report.model_dump(mode="json"),
                         )
 
                 # Safe Boundary Resumption Check:
@@ -359,10 +382,21 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                 state_machine.enter_stage(PipelineStage.EXTRACTION)
                 doc_type = DocumentType.from_filename(filename)
                 extractor = self.extractor_registry.get_extractor(doc_type)
+                t_ext_start = time.perf_counter()
                 extraction_result = await extractor.extract(file_bytes, context)
+                t_ext_duration = time.perf_counter() - t_ext_start
                 if not extraction_result.elements:
                     raise ExtractionError(f"No textual elements extracted from file: {filename}")
                 state_machine.complete_stage(PipelineStage.EXTRACTION, items_processed=len(extraction_result.elements))
+
+                # Track extraction telemetry in metrics collector
+                total_pages = getattr(extraction_result.metadata, "total_pages", None) or 1
+                self.metrics_collector.record_extraction_details(
+                    job_id=job_id,
+                    page_count=total_pages,
+                    element_count=len(extraction_result.elements),
+                    duration_seconds=t_ext_duration,
+                )
 
                 # -------------------------------------------------------------
                 # Stage 4: Structure-Aware Chunking
@@ -404,8 +438,18 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                 # -------------------------------------------------------------
                 state_machine.enter_stage(PipelineStage.EMBEDDING)
                 chunk_texts = [c.content for c in chunks]
+                t_emb_start = time.perf_counter()
                 vectors = await self.embedding_service.embed_texts(chunk_texts)
+                t_emb_duration = time.perf_counter() - t_emb_start
                 state_machine.complete_stage(PipelineStage.EMBEDDING, items_processed=len(vectors))
+
+                # Track embedding telemetry in metrics collector
+                total_tokens = sum(getattr(c, "token_count", 0) for c in chunks)
+                self.metrics_collector.record_embedding_details(
+                    job_id=job_id,
+                    token_count=total_tokens,
+                    duration_seconds=t_emb_duration,
+                )
 
                 # Prepare staged point IDs for compensation tracking
                 staged_point_ids = [to_point_id(c.chunk_id) for c in chunks]
@@ -443,8 +487,17 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                 # Stage 9: Qdrant Indexing via Outbox Dispatcher
                 # -------------------------------------------------------------
                 state_machine.enter_stage(PipelineStage.INDEXING)
+                t_idx_start = time.perf_counter()
                 await self.outbox_dispatcher.dispatch_event(saved_outbox, context=context)
+                t_idx_duration = time.perf_counter() - t_idx_start
                 state_machine.complete_stage(PipelineStage.INDEXING, items_processed=len(chunks))
+
+                # Track indexing telemetry in metrics collector
+                self.metrics_collector.record_indexing_details(
+                    job_id=job_id,
+                    points_count=len(chunks),
+                    duration_seconds=t_idx_duration,
+                )
 
                 # -------------------------------------------------------------
                 # Stage 10: Complete Pipeline & Update Relational Status
@@ -452,9 +505,15 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                 state_machine.complete_pipeline("Document ingestion and cross-storage indexing completed successfully")
 
                 duration = time.perf_counter() - start_time
+                report = self.metrics_collector.finish_job(
+                    job_id=job_id,
+                    status="COMPLETED",
+                    total_duration_seconds=duration,
+                )
                 return IngestionPipelineResult(
                     document_id=document_id,
                     tenant_id=tenant_id,
+                    job_id=job_id,
                     status=DocumentIngestionStatus.COMPLETED,
                     final_stage=PipelineStage.INDEXING,
                     chunks_created=len(chunks),
@@ -462,6 +521,7 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                     duration_seconds=round(duration, 4),
                     metadata=extraction_result.metadata,
                     warnings=state_machine.warnings,
+                    metrics=report.model_dump(mode="json"),
                 )
 
             except Exception as e:
@@ -489,9 +549,17 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                         logger.error("Error executing compensation: %s", comp_err)
 
                 duration = time.perf_counter() - start_time
+                report = self.metrics_collector.finish_job(
+                    job_id=job_id,
+                    status="FAILED",
+                    total_duration_seconds=duration,
+                    error_message=str(e),
+                    error_stage=str(current_stg),
+                )
                 return IngestionPipelineResult(
                     document_id=document_id,
                     tenant_id=tenant_id,
+                    job_id=job_id,
                     status=DocumentIngestionStatus.FAILED,
                     final_stage=current_stg,
                     chunks_created=0,
@@ -499,6 +567,7 @@ class DefaultIngestionOrchestrator(IngestionOrchestrator):
                     duration_seconds=round(duration, 4),
                     warnings=state_machine.warnings,
                     error_message=str(e),
+                    metrics=report.model_dump(mode="json"),
                 )
 
     def _resolve_bytes(self, content: bytes | BinaryIO | Path) -> bytes:

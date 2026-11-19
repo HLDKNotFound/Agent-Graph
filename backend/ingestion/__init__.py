@@ -124,6 +124,12 @@ from backend.ingestion.indexing import (
     serialize_chunk_payload,
     to_point_id,
 )
+from backend.ingestion.observability import (
+    JobMetricsReport,
+    PipelineMetricsCollector,
+    StageMetric,
+    get_pipeline_metrics_collector,
+)
 from backend.ingestion.orchestration import (
     ChunkRepository,
     CompensationManager,
@@ -450,4 +456,9 @@ __all__ = [
     "CompensationManager",
     "CrossStorageReconciler",
     "ReconciliationReport",
+    # Observability & Metrics
+    "JobMetricsReport",
+    "PipelineMetricsCollector",
+    "StageMetric",
+    "get_pipeline_metrics_collector",
 ]

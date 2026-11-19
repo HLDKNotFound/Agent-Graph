@@ -2,7 +2,7 @@
 
 import abc
 from pathlib import Path
-from typing import BinaryIO
+from typing import Any, BinaryIO
 from pydantic import BaseModel, ConfigDict, Field
 
 from backend.ingestion.types.context import IngestionContext
@@ -21,10 +21,12 @@ class IngestionPipelineResult(BaseModel):
     final_stage: PipelineStage = Field(..., description="Last completed pipeline stage")
     chunks_created: int = Field(default=0, ge=0, description="Number of chunks generated")
     points_indexed: int = Field(default=0, ge=0, description="Number of vector points indexed")
+    job_id: str | None = Field(default=None, description="Ingestion job UUID for observability tracking")
     duration_seconds: float = Field(default=0.0, ge=0.0, description="Total pipeline execution runtime")
     metadata: DocumentMetadata | None = Field(default=None, description="Persisted document metadata")
     warnings: list[str] = Field(default_factory=list, description="Aggregated non-fatal warnings")
     error_message: str | None = Field(default=None, description="Failure diagnostic message if FAILED")
+    metrics: dict[str, Any] | None = Field(default=None, description="Granular stage and throughput telemetry")
 
 
 class IngestionOrchestrator(abc.ABC):
