@@ -131,7 +131,7 @@ class ChunkingEngine:
         )
 
         # Post-chunking validation and invariant checks
-        self._validate_chunks(chunks, context)
+        self._validate_chunks(chunks, context, extraction_result=extraction_result)
         return chunks
 
     def chunk_document_sync(
@@ -170,6 +170,7 @@ class ChunkingEngine:
         self,
         chunks: list[DocumentChunkInput],
         context: IngestionContext,
+        extraction_result: ExtractionResult | None = None,
     ) -> None:
         """Enforce strict invariant checks on generated chunk records."""
         for idx, chunk in enumerate(chunks):
@@ -198,6 +199,16 @@ class ChunkingEngine:
                 raise ChunkingError(
                     f"Malformed content hash in chunk {chunk.chunk_id}: '{chunk.content_hash}'"
                 )
+
+        # Enforce provenance and locator coordinate validation against document boundaries
+        from backend.ingestion.validation.provenance import default_provenance_validator
+
+        default_provenance_validator.validate_chunks(
+            chunks=chunks,
+            context=context,
+            extraction_result=extraction_result,
+            strict=True,
+        )
 
 
 # Global default instance and convenience helpers

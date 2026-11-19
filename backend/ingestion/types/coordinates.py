@@ -215,6 +215,66 @@ class ChunkLocator(BaseModel):
             }
         return payload
 
+    @classmethod
+    def from_db_record(cls, record: dict[str, Any]) -> "ChunkLocator":
+        """Reconstruct ChunkLocator from PostgreSQL document_chunks relational record.
+
+        Supports both snake_case and camelCase field naming conventions.
+        """
+        return cls(
+            page_number=record.get("page_number") if record.get("page_number") is not None else record.get("pageNumber"),
+            section_heading=record.get("section_heading") if record.get("section_heading") is not None else record.get("sectionHeading"),
+            sheet_name=record.get("sheet_name") if record.get("sheet_name") is not None else record.get("sheetName"),
+            row_range=record.get("row_range") if record.get("row_range") is not None else record.get("rowRange"),
+            char_start=record.get("char_start") if record.get("char_start") is not None else record.get("charStart"),
+            char_end=record.get("char_end") if record.get("char_end") is not None else record.get("charEnd"),
+            bounding_box=None,
+        )
+
+    @classmethod
+    def from_qdrant_payload(cls, payload: dict[str, Any]) -> "ChunkLocator":
+        """Reconstruct ChunkLocator from Qdrant vector point source_location payload."""
+        source_loc = payload.get("source_location") if isinstance(payload.get("source_location"), dict) else payload
+        bb_data = source_loc.get("bounding_box")
+        bb = None
+        if isinstance(bb_data, dict):
+            bb = BoundingBox(
+                x0=bb_data["x0"],
+                y0=bb_data["y0"],
+                x1=bb_data["x1"],
+                y1=bb_data["y1"],
+                unit=bb_data.get("unit", "pt"),
+                page_number=source_loc.get("page_number"),
+            )
+        return cls(
+            page_number=source_loc.get("page_number"),
+            section_heading=source_loc.get("section_heading"),
+            sheet_name=source_loc.get("sheet_name"),
+            row_range=source_loc.get("row_range"),
+            char_start=source_loc.get("char_start"),
+            char_end=source_loc.get("char_end"),
+            bounding_box=bb,
+        )
+
+    def format_citation(self) -> str:
+        """Format human-readable verifiable citation badge e.g. '[Page 3, Section: Arch]'."""
+        parts = []
+        if self.page_number is not None:
+            parts.append(f"Page {self.page_number}")
+        if self.sheet_name:
+            parts.append(f"Worksheet: {self.sheet_name}")
+        if self.row_range:
+            parts.append(f"Rows {self.row_range}" if not self.row_range.lower().startswith("row") else self.row_range)
+        if self.section_heading:
+            parts.append(f"Section: {self.section_heading}")
+
+        if not parts:
+            if self.char_start is not None and self.char_end is not None:
+                parts.append(f"Chars {self.char_start}:{self.char_end}")
+            else:
+                return "[Unknown Location]"
+        return f"[{', '.join(parts)}]"
+
 
 # ElementLocator alias for unified locator terminology across extracted elements
 ElementLocator = ChunkLocator

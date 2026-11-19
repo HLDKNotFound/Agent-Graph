@@ -72,6 +72,41 @@ class MalformedFileError(CorruptDocumentError):
     pass
 
 
+class ProvenanceValidationError(ValidationError):
+    """Raised when chunk provenance coordinates fail validation against source document boundaries.
+
+    Identifies the affected document, chunk, field, and constraint violation.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        document_id: str | None = None,
+        chunk_id: str | None = None,
+        chunk_index: int | None = None,
+        field: str | None = None,
+        invalid_value: Any | None = None,
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        merged = dict(details or {})
+        if document_id:
+            merged["document_id"] = document_id
+        if chunk_id:
+            merged["chunk_id"] = chunk_id
+        if chunk_index is not None:
+            merged["chunk_index"] = chunk_index
+        if field:
+            merged["field"] = field
+        if invalid_value is not None:
+            merged["invalid_value"] = invalid_value
+        super().__init__(message, details=merged)
+        self.document_id = document_id
+        self.chunk_id = chunk_id
+        self.chunk_index = chunk_index
+        self.field = field
+        self.invalid_value = invalid_value
+
+
 # ==========================================
 # STORAGE SUBSYSTEM EXCEPTIONS
 # ==========================================
