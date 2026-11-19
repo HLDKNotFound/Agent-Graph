@@ -89,6 +89,34 @@ class ExtractorRegistry:
 
             return candidates[0]
 
+    def get_extractor_for_file(
+        self,
+        filename: str,
+        mime_type: str | None = None,
+        prefer_ocr: bool = False,
+    ) -> DocumentExtractor:
+        """Convenience method to resolve extractor directly from filename and MIME type."""
+        from pathlib import Path
+        ext = Path(filename).suffix.lower()
+        doc_type = None
+        if ext == ".pdf":
+            doc_type = DocumentType.PDF
+            mime_type = mime_type or "application/pdf"
+        elif ext == ".docx":
+            doc_type = DocumentType.DOCX
+            mime_type = mime_type or "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        elif ext == ".xlsx":
+            doc_type = DocumentType.XLSX
+            mime_type = mime_type or "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        elif ext == ".csv":
+            doc_type = DocumentType.CSV
+            mime_type = mime_type or "text/csv"
+        elif ext == ".txt":
+            doc_type = DocumentType.TEXT
+            mime_type = mime_type or "text/plain"
+
+        return self.get_extractor(document_type=doc_type, mime_type=mime_type, prefer_ocr=prefer_ocr)
+
     def list_extractors(self) -> list[DocumentExtractor]:
         """Return a copy of all currently registered extractors."""
         with self._lock:

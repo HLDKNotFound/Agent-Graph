@@ -304,6 +304,75 @@ class IngestionSettings(BaseSettings):
         description="Whether to prefer gRPC over HTTP for vector operations",
     )
 
+    # ------------------------------------------
+    # Redis & Celery Background Worker Settings
+    # ------------------------------------------
+    redis_url: str = Field(
+        default="redis://localhost:6379/0",
+        alias="REDIS_URL",
+        description="Redis connection URL for cache and distributed locking",
+    )
+    celery_broker_url: str = Field(
+        default="redis://localhost:6379/1",
+        alias="CELERY_BROKER_URL",
+        description="Celery message broker URL",
+    )
+    celery_result_backend: str = Field(
+        default="redis://localhost:6379/2",
+        alias="CELERY_RESULT_BACKEND",
+        description="Celery task result backend URL",
+    )
+    celery_task_default_queue: str = Field(
+        default="document_ingestion",
+        alias="CELERY_TASK_DEFAULT_QUEUE",
+        description="Default queue name for document ingestion tasks",
+    )
+    celery_worker_concurrency: int = Field(
+        default=4,
+        alias="CELERY_WORKER_CONCURRENCY",
+        description="Number of concurrent worker processes",
+    )
+    celery_task_time_limit: int = Field(
+        default=600,
+        alias="CELERY_TASK_TIME_LIMIT",
+        description="Hard time limit in seconds for tasks before termination (default: 600s / 10m)",
+    )
+    celery_task_soft_time_limit: int = Field(
+        default=540,
+        alias="CELERY_TASK_SOFT_TIME_LIMIT",
+        description="Soft time limit in seconds for tasks before SoftTimeLimitExceeded (default: 540s / 9m)",
+    )
+    celery_task_max_retries: int = Field(
+        default=3,
+        alias="CELERY_TASK_MAX_RETRIES",
+        description="Maximum retry attempts on transient task failures",
+    )
+    celery_task_retry_backoff: int = Field(
+        default=2,
+        alias="CELERY_TASK_RETRY_BACKOFF",
+        description="Exponential backoff factor for retries",
+    )
+    celery_task_retry_backoff_max: int = Field(
+        default=60,
+        alias="CELERY_TASK_RETRY_BACKOFF_MAX",
+        description="Maximum backoff delay in seconds between retries",
+    )
+    celery_task_acks_late: bool = Field(
+        default=True,
+        alias="CELERY_TASK_ACKS_LATE",
+        description="Acknowledge task only after execution completes to prevent task loss on crash",
+    )
+    celery_worker_prefetch_multiplier: int = Field(
+        default=1,
+        alias="CELERY_WORKER_PREFETCH_MULTIPLIER",
+        description="Prefetch limit for worker processes (1 for heavy compute/OCR tasks)",
+    )
+    celery_task_always_eager: bool = Field(
+        default=False,
+        alias="CELERY_TASK_ALWAYS_EAGER",
+        description="Whether to execute tasks synchronously locally (useful for unit testing and offline CI)",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_ingestion_settings() -> IngestionSettings:

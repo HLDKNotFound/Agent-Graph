@@ -53,7 +53,8 @@ docs/
         ├── task_10_chunk_provenance_and_locator_validation.md
         ├── task_11_minhash_lsh_near_duplicate_chunk_detection.md
         ├── task_12_bge_m3_dense_embedding_service.md
-        └── task_13_qdrant_vector_indexing_and_payload_management.md
+        ├── task_13_qdrant_vector_indexing_and_payload_management.md
+        └── task_14_celery_redis_asynchronous_workers.md
 ```
 
 ---
@@ -130,6 +131,7 @@ Detailed task completion reports tracking implementation progress across Phase 2
 | ⚡ [**Task 11: MinHash LSH Near-Duplicate Chunk Detection**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_11_minhash_lsh_near_duplicate_chunk_detection.md) | Near-Duplicate Detection | Vectorized MinHash (128 permutations), optimal LSH candidate buckets, exact vs near-duplicate discrimination, version scope |
 | 🧠 [**Task 12: BGE-M3 Dense Vector Embedding Service**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_12_bge_m3_dense_embedding_service.md) | Vector Embeddings | Dense 1024-dim L2-normalized representations, BgeM3ModelManager thread-safe caching, device selection, retry-safe batching, CPU fallback |
 | 🗄️ [**Task 13: Qdrant Vector Indexing & Payload Management**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_13_qdrant_vector_indexing_and_payload_management.md) | Vector Store Persistence | Qdrant v1.8+ integration, 1024-dim Cosine, HNSW (m=16, ef_c=128, ef=64), stable UUID point IDs, zero-trust RBAC payload indexing, tenant isolation |
+| ⚡ [**Task 14: Celery + Redis Asynchronous Workers**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_14_celery_redis_asynchronous_workers.md) | Asynchronous Orchestration | Background worker infrastructure, Celery + Redis, modular tasks (extract/chunk/embed/index/pipeline), idempotency locks, late acks, structured task logs |
 
 ---
 
