@@ -53,7 +53,16 @@ from backend.ingestion.deduplication import (
     get_chunk_deduplicator,
     normalize_chunk_text,
 )
-from backend.ingestion.embedding import EmbeddingProvider, EmbeddingResult
+from backend.ingestion.embedding import (
+    BgeM3Config,
+    BgeM3EmbeddingService,
+    BgeM3ModelManager,
+    EmbeddingBatchStats,
+    EmbeddingProvider,
+    EmbeddingResult,
+    get_embedding_service,
+    resolve_device,
+)
 from backend.ingestion.exceptions import (
     ChunkingError,
     ConcurrentDuplicateError,
@@ -248,6 +257,12 @@ __all__ = [
     "compute_content_sha256",
     "EmbeddingProvider",
     "EmbeddingResult",
+    "BgeM3EmbeddingService",
+    "BgeM3ModelManager",
+    "BgeM3Config",
+    "EmbeddingBatchStats",
+    "get_embedding_service",
+    "resolve_device",
     "VectorIndexProvider",
     "VectorIndexResult",
     "IngestionOrchestrator",

@@ -51,7 +51,8 @@ docs/
         ├── task_08_sha256_exact_document_deduplication.md
         ├── task_09_structure_aware_chunking_engine.md
         ├── task_10_chunk_provenance_and_locator_validation.md
-        └── task_11_minhash_lsh_near_duplicate_chunk_detection.md
+        ├── task_11_minhash_lsh_near_duplicate_chunk_detection.md
+        └── task_12_bge_m3_dense_embedding_service.md
 ```
 
 ---
@@ -126,6 +127,7 @@ Detailed task completion reports tracking implementation progress across Phase 2
 | 🧩 [**Task 09: Structure-Aware Chunking Engine**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_09_structure_aware_chunking_engine.md) | Structural Segmentation | Recursive structural chunker with heading inheritance, sliding window with 10% overlap, semantic table-aware chunker |
 | 📍 [**Task 10: Chunk Provenance & Locator Validation**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_10_chunk_provenance_and_locator_validation.md) | Provenance Verification | Format-aware locator coordinate validator, physical boundary verification, [charStart, charEnd) intervals, citation badges |
 | ⚡ [**Task 11: MinHash LSH Near-Duplicate Chunk Detection**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_11_minhash_lsh_near_duplicate_chunk_detection.md) | Near-Duplicate Detection | Vectorized MinHash (128 permutations), optimal LSH candidate buckets, exact vs near-duplicate discrimination, version scope |
+| 🧠 [**Task 12: BGE-M3 Dense Vector Embedding Service**](file:///home/mercury/AgentGraph/docs/phases/phase_2/task_12_bge_m3_dense_embedding_service.md) | Vector Embeddings | Dense 1024-dim L2-normalized representations, BgeM3ModelManager thread-safe caching, device selection, retry-safe batching, CPU fallback |
 
 ---
 

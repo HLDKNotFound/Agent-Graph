@@ -216,6 +216,40 @@ class IngestionSettings(BaseSettings):
         description="Deterministic PRNG seed for universal permutation generation",
     )
 
+    # ------------------------------------------
+    # Dense Vector Embedding Settings (BGE-M3)
+    # ------------------------------------------
+    embedding_model_name: str = Field(
+        default="BAAI/bge-m3",
+        alias="EMBEDDING_MODEL_NAME",
+        description="Pretrained embedding model identifier (default: BAAI/bge-m3)",
+    )
+    embedding_dimension: int = Field(
+        default=1024,
+        alias="EMBEDDING_DIMENSION",
+        description="Expected dense embedding vector dimension (default: 1024)",
+    )
+    embedding_device: str = Field(
+        default="auto",
+        alias="EMBEDDING_DEVICE",
+        description="Compute device for embedding inference ('auto', 'cuda', 'cpu')",
+    )
+    embedding_batch_size: int = Field(
+        default=32,
+        alias="EMBEDDING_BATCH_SIZE",
+        description="Batch size for vector embedding inference (default: 32)",
+    )
+    embedding_max_length: int = Field(
+        default=8192,
+        alias="EMBEDDING_MAX_LENGTH",
+        description="Maximum token sequence length supported by BGE-M3 (default: 8192)",
+    )
+    embedding_normalize: bool = Field(
+        default=True,
+        alias="EMBEDDING_NORMALIZE",
+        description="Whether to L2-normalize dense embeddings to unit length (default: True)",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_ingestion_settings() -> IngestionSettings:
