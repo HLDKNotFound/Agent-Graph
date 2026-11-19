@@ -4,7 +4,21 @@ Provides foundational modular architecture, typed data contracts, provenance loc
 zero-trust RBAC access control payloads, file validation, storage abstraction, and pluggable extractor registry.
 """
 
-from backend.ingestion.chunking import ChunkingStrategy
+from backend.ingestion.chunking import (
+    ChunkingEngine,
+    ChunkingStrategy,
+    FixedSlidingWindowChunker,
+    RecursiveStructuralChunker,
+    SemanticTableAwareChunker,
+    TableAwareChunker,
+    UnsupportedChunkingStrategyError,
+    count_tokens,
+    decode_tokens,
+    default_chunking_engine,
+    encode_tokens,
+    generate_chunk_id,
+    get_chunking_strategy,
+)
 from backend.ingestion.config import IngestionSettings, get_ingestion_settings
 from backend.ingestion.deduplication import (
     DeduplicationResult,
@@ -162,7 +176,20 @@ __all__ = [
     "DefaultDocumentValidator",
     "ValidationResult",
     "ChunkingStrategy",
+    "FixedSlidingWindowChunker",
+    "RecursiveStructuralChunker",
+    "SemanticTableAwareChunker",
+    "TableAwareChunker",
+    "ChunkingEngine",
+    "default_chunking_engine",
+    "get_chunking_strategy",
+    "UnsupportedChunkingStrategyError",
+    "count_tokens",
+    "encode_tokens",
+    "decode_tokens",
+    "generate_chunk_id",
     "DeduplicationStrategy",
+
     "Sha256ExactDeduplicationStrategy",
     "DocumentDeduplicator",
     "DeduplicationResult",

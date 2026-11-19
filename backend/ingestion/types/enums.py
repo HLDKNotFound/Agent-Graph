@@ -127,3 +127,17 @@ class ChunkingStrategyType(str, Enum):
     RECURSIVE_STRUCTURAL = "RECURSIVE_STRUCTURAL"
     FIXED_SLIDING_WINDOW = "FIXED_SLIDING_WINDOW"
     TABLE_AWARE = "TABLE_AWARE"
+    SEMANTIC_TABLE_AWARE = "SEMANTIC_TABLE_AWARE"
+
+    @classmethod
+    def _missing_(cls, value: object):
+        """Case-insensitive and alias-aware enum member lookup."""
+        if isinstance(value, str):
+            normalized = value.strip().upper()
+            if normalized in ("TABLE_AWARE", "SEMANTIC_TABLE_AWARE"):
+                return cls.SEMANTIC_TABLE_AWARE if normalized == "SEMANTIC_TABLE_AWARE" else cls.TABLE_AWARE
+            for member in cls:
+                if member.value == normalized or member.name == normalized:
+                    return member
+        return None
+

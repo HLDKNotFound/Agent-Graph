@@ -28,7 +28,13 @@ class ChunkingConfig(BaseModel):
         default=64,
         ge=0,
         le=1024,
-        description="Number of overlapping tokens between adjacent sequential chunks (~12.5%)",
+        description="Number of overlapping tokens between adjacent sequential chunks (~12.5% default, overridden by 10% overlap rule in sliding window)",
+    )
+    overlap_percentage: float = Field(
+        default=0.10,
+        ge=0.0,
+        le=0.50,
+        description="Target percentage overlap for sliding window chunking (default: 0.10 for 10% overlap)",
     )
     separators: list[str] = Field(
         default_factory=lambda: ["\n\n# ", "\n\n## ", "\n\n### ", "\n\n", "\n", ". "],
@@ -38,6 +44,13 @@ class ChunkingConfig(BaseModel):
         default=True,
         description="Prepend nearest parent section heading to child chunks to retain semantic context",
     )
+
+    def get_effective_overlap(self) -> int:
+        """Calculate effective token overlap based on 10% rule or explicit configuration."""
+        if self.chunk_overlap_tokens != 64:
+            return self.chunk_overlap_tokens
+        return max(1, int(round(self.chunk_size_tokens * self.overlap_percentage)))
+
 
 
 class DocumentChunkInput(BaseModel):
